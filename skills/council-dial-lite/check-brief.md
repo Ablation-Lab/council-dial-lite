@@ -2,7 +2,7 @@
 
 Council Dial Lite only. After a council, Claude writes the run's summary by copying findings from the agents' reports. A fresh check agent then gets this brief and compares the summary with those reports. The check doesn't judge whether the findings are right, only whether the summary reproduces them.
 
-`{{rule}}` is the `rule-` text below for the run's combine method (`rule-judged`, `rule-pooled` or `rule-consensus`). If the run's appeal ran, a space and `rule-appeal` follow it, and if the run had a baseline, a space and `rule-baseline` follow that.
+`{{rule}}` is the `rule-` text below for the run's combine method (`rule-judged`, `rule-pooled` or `rule-consensus`). If the run's appeal ran, a space and `rule-appeal` follow it, and if the run had a baseline, a space and `rule-baseline` follow that. In a run with brief version 3, use `rule-judged-v3` and `rule-appeal-v3` in place of `rule-judged` and `rule-appeal`: version 3's judge ranks every finding it didn't throw out, and its appeal also checks severities.
 
 ## brief
 
@@ -46,6 +46,18 @@ the council's findings: each finding that more than half of the reviewers raised
 
 ```text
 Also, in its own section, every finding in the appeal report marked WRONGLY DISMISSED or UNSURE.
+```
+
+## rule-judged-v3
+
+```text
+every finding in the judge's final ranked list, and no others from the judge's report.
+```
+
+## rule-appeal-v3
+
+```text
+Also, in its own section, every finding in the appeal report marked WRONGLY DISMISSED, TOO LOW, TOO HIGH or UNSURE.
 ```
 
 ## rule-baseline
