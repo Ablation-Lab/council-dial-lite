@@ -24,7 +24,7 @@ This is the lighter edition. The full Council Dial uses a local script for the b
 - **Councils cost tokens, so ask first.** Each reviewer, debate turn, baseline, judge, appeal and check is a separate subagent. Before you start a council, tell the user the type, how many agents it uses and any estimate (section 2), and wait for a yes, every time, even if they named a preset.
 - **Lite runs stay in the Lite folder.** That's `reviews/lite/` in the project, unless the user chose another folder inside the project. It can't be inside `.git` or `.claude`, or be the full Council Dial's log folder (the one holding `review-log.jsonl`) or one of its run folders. Write only inside it, and never write to a full Council Dial log or run folder. Lite run ids start with `lite-`.
 - **If the full Council Dial is also installed** and the user didn't name an edition, say both are installed and ask which to use: the full one for research runs, Lite otherwise.
-- **Log every deviation.** Whenever you do anything differently from this file (a step skipped, done in another order or another way, or a rule you couldn't follow or found unclear), add one line saying what and why (no secrets, and nothing quoted from the material or the reports) to the run's `deviations` list in `run.json` as soon as you notice, or, before `run.json` exists, as soon as you write it; and tell the user at the end. This covers what you do; what an agent does, such as replying without saving, goes in its `agents` entry instead. If nothing deviated, `deviations` stays `[]`.
+- **Log every deviation.** Whenever you do anything differently from this file (a step skipped, done in another order or another way, or a rule you couldn't follow or found unclear), add one line saying what and why, with the exact text of anything you added to or changed in a prompt (no secrets, and nothing else quoted from the material or the reports) to the run's `deviations` list in `run.json` as soon as you notice, or, before `run.json` exists, as soon as you write it; and tell the user at the end. This covers what you do; what an agent does, such as replying without saving, goes in its `agents` entry instead. If nothing deviated, `deviations` stays `[]`.
 
 ## 1. Choose the type
 
@@ -45,7 +45,7 @@ The parts:
 - **Model:** the user can pick `sonnet`, `opus`, `haiku` or `fable` for every subagent, passed as the Agent tool's `model` on every call; otherwise leave `model` out and they inherit this session's model. If they pick one that isn't this session's model, say the subagents run at that model's default effort level, not this session's. Record your own model id, the one your system prompt gives, as `models.main` when it starts with `claude-` and has only lower-case letters, digits, dots and hyphens, optionally ending in `[1m]`; otherwise record `null` and tell the user in one line. You can't see `CLAUDE_CODE_SUBAGENT_MODEL` or `CLAUDE_CODE_SUBAGENT_MODEL_FORCE`: ask the user only if they mention them, and record what they say as `models.env` (an alias or a model id of the form above) and `models.force` (`true` only if `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` is `1` or `true`).
 - **Effort:** neither you nor Lite sets it, and Lite can't read it; it's logged as `null`.
 
-The largest custom council is 22 agents with the check. Agree what's being reviewed in one line, in your or the user's own words: trim it, turn every run of spaces, tabs or line breaks into one space, drop control and invisible characters, and keep it to 600 characters (the character rules for roles don't apply to it). Describe the material only, what it is and where: never say it has planted, deliberate or known problems (even for a sample), or mention an answer key or expected findings, because that changes how the reviewers review it. Don't put secrets or private details in it; it's stored in the log.
+The largest custom council is 22 agents with the check. Agree what's being reviewed in one line, in your or the user's own words: trim it, turn every run of spaces, tabs or line breaks into one space, drop control and invisible characters, and keep it to 600 characters (the character rules for roles don't apply to it). Describe the material only, what it is and where. If anything next to it is out of scope, such as a folder of sample data, say so in the same line, such as `shelfkeep.py, scripts/tidy.sh and README.md; not the shelves/ folder (sample data)`: this line is the only description of the target the briefs get, so an exclusion you only tell the user doesn't reach the agents. Never say it has planted, deliberate or known problems (even for a sample), or mention an answer key or expected findings, because that changes how the reviewers review it. Don't put secrets or private details in it; it's stored in the log.
 
 **The label.** Build it from the type and models, never from a stored label:
 - Start with `lite: `, then `specialised` or `generalist`, a hyphen and the number of reviewers.
@@ -100,7 +100,7 @@ Build each brief just before you start its agent, from the templates. Then, as a
 ```json
 {
   "edition": "council-dial-lite",
-  "liteVersion": "1.1.1",
+  "liteVersion": "1.1.2",
   "briefVersion": 2,
   "runId": "lite-20261108-01",
   "planned": "2026-11-08",
@@ -110,7 +110,7 @@ Build each brief just before you start its agent, from the templates. Then, as a
   "models": { "main": "claude-opus-5-5", "requested": null, "env": null, "force": false },
   "effort": null,
   "agents": [
-    { "label": "reviewer: correctness", "step": "review", "file": "reviewer-correctness.txt", "started": null, "savedBy": null, "savedMatchesReply": null, "tokens": null, "toolUses": null, "durationMs": null }
+    { "label": "reviewer: correctness", "step": "review", "file": "reviewer-correctness.txt", "started": null, "replyUnescaped": null, "savedBy": null, "savedMatchesReply": null, "tokens": null, "toolUses": null, "durationMs": null }
   ],
   "results": null,
   "check": null,
@@ -133,6 +133,8 @@ For each step in order, start its agents with the Agent tool as general-purpose 
 
 The save line comes first and again last because agents told to save only at the end of their prompt have sometimes replied without saving.
 
+Add nothing else to any prompt: no notes about the material, no instructions on numbering or format, and never a file path in place of a report. The material line gives the paths and anything out of scope exactly as the description says. If you do add or change anything, log it in `deviations` with the exact text and why.
+
 Each report goes in its own block, `<report from="<label>">` … `</report>`, where the label is the seat's label and nothing else, copied in full and exactly from the agent's reply. If a reply contains `<report`, `</report>`, `<dismissed` or `</dismissed>`, don't pass it on: stop and tell the user. Then:
 
 - **review:** start every reviewer in one message, and don't show any reviewer another's report. If sequential, start them one at a time, in order, passing each the earlier reports.
@@ -142,14 +144,14 @@ Each report goes in its own block, `<report from="<label>">` … `</report>`, wh
 - **appeal:** if the judge marked nothing NOT REAL, don't start it; say there was nothing to appeal. Otherwise give it each NOT REAL finding copied exactly from the judge's reply, with the judge's reasons, in one `<dismissed from="judge">` … `</dismissed>` block. Never give it the reviewers' reports, any other brief or the description of what's reviewed.
 
 When each agent finishes:
-- Its reply is the report text in its completion notice or result. A notice can show `<`, `>` and `&` as `&lt;`, `&gt;` and `&amp;`: read them as the characters they stand for, both when you compare and when you copy.
+- Its reply is the report text in its completion notice or result. A notice can show `<`, `>` and `&` as `&lt;`, `&gt;` and `&amp;`: read them as the characters they stand for when you compare, copy or save it, and set the agent's `replyUnescaped` to `true` (otherwise `false`).
 - The reply is everything the agent replied, including any heading, preamble or closing line it added although its brief says "No other text" (such as `REPORT:` or `Method:`). Don't strip anything from it.
 - Read its file in `reports/` and compare it with its reply, character for character. Whitespace at the very end (spaces, tabs and line breaks after the last other character) doesn't count, in the file or the reply, and nor does a line ending's style (CRLF or LF); every other difference does, including blank lines, spacing and Markdown formatting anywhere else. Take the first of these cases that applies:
   - **The agent failed or returned nothing:** say so, leave `savedBy` and `savedMatchesReply` `null` (any file it saved isn't used), and count it as 0 findings.
   - **Saved and the same:** set `savedBy` to `agent` and `savedMatchesReply` to `true`.
   - **Saved but different:** keep the agent's file, save the reply next to it as `<agent file without .txt>.reply.txt`, set `savedBy` to `agent` and `savedMatchesReply` to `false`, tell the user, and use the reply from then on.
   - **Not saved, or empty** (the agent replied without saving, or a permission prompt was denied): save the reply there yourself, exactly; set `savedBy` to `main session` and `savedMatchesReply` to `null`, since there's no file of the agent's to compare; and tell the user.
-- Record the usage Claude Code reported with it (in a completion notice, `subagent_tokens`, `tool_uses` and `duration_ms`) as `tokens`, `toolUses` and `durationMs`. Where none was reported, leave `null`; never estimate.
+- Record the usage Claude Code reported with it (in a completion notice, `subagent_tokens`, `tool_uses` and `duration_ms`) as `tokens`, `toolUses` and `durationMs`. Where none was reported, leave `null`; never estimate. `durationMs` is wall-clock time: in Manual mode it includes any time the agent waited for the user to approve a permission prompt, so it isn't pure model time. Say so whenever you show times or critical paths.
 
 Before each later step, and before the check, read again every saved report you're about to pass on or check, and compare it with the reply you recorded for it. If any has changed since, don't carry on: tell the user which file changed, and stop. Compare by the same rule as above, and where there's a `.reply.txt` file, compare that one: the agent's own differing file is kept only as a record. A report you compared after every agent you'd started had finished, with no agent started since, counts as read again.
 
@@ -176,7 +178,7 @@ When it finishes, record its counts in `run.json` as `"check": {"findings": n, "
 
 ## 7. Report to the user
 
-First go back through sections 1 to 6 and add to `deviations` anything you did differently that isn't logged yet. Then give the council's findings from `summary.txt`, most serious first, copied exactly, with their citations. Then, if there was a baseline, what the baseline found that the council didn't, and the reverse. If the appeal ran, list each finding it marked WRONGLY DISMISSED or UNSURE with both views side by side, the judge's reasons and the appeal's evidence, and ask the user to call each one: reinstate it or uphold the dismissal. Don't make the call yourself. Then give the check's counts, any report whose saved file didn't match its reply or that its agent didn't save, and every deviation. Offer the full reports.
+First go back through sections 1 to 6 and add to `deviations` anything you did differently that isn't logged yet. For a judged run, compare each merged finding's final severity with every reviewer's severity for it (an OVERSTATED one at the severity the judge corrected it to), and list every one that differs, up or down, including where reviewers disagreed and the judge took one of their ratings: its citation, each reviewer's severity, the judge's, and the judge's reason, quoted, if it gave one ("no reason given" if not). Give the user that list, and log it as `severityChanges`. Then give the council's findings from `summary.txt`, most serious first, copied exactly, with their citations. Then, if there was a baseline, what the baseline found that the council didn't, and the reverse. If the appeal ran, list each finding it marked WRONGLY DISMISSED or UNSURE with both views side by side, the judge's reasons and the appeal's evidence, and ask the user to call each one: reinstate it or uphold the dismissal. Don't make the call yourself. Then give the check's counts, any report whose saved file didn't match its reply or that its agent didn't save, and every deviation. Offer the full reports.
 
 ## 8. Log the results
 
@@ -189,6 +191,7 @@ Set `results` in `run.json`:
   "confirmed": 4, "overstated": 1, "dismissed": 2, "verified": true,
   "severity": { "high": 1, "med": 3, "low": 3 },
   "baseline": null,
+  "severityChanges": [{ "finding": "lite-20261108-01/judge/merged 4", "reviewers": ["MED", "HIGH"], "judge": "HIGH", "reason": null }],
   "appeal": { "ran": true, "reviewed": 2, "items": [{ "finding": "lite-20261108-01/judge/merged 6: <short title, no secrets>", "view": "unsure", "call": "pending" }] },
   "wallMinutes": null,
   "criticalPathMinutes": null,
@@ -205,6 +208,7 @@ Check each rule before you write; if one fails, recount from the replies rather 
 - `appeal`: `null` when the type has no appeal (it isn't judged, or the user turned the appeal off). Otherwise `ran`, `reviewed` (never more than `dismissed`) and one item per finding it marked WRONGLY DISMISSED or UNSURE, with the user's `call`: `reinstated`, `upheld` or `pending`. When the judge marked nothing NOT REAL, it's `{"ran": false, "reviewed": 0, "items": []}`.
 - `wallMinutes`: always `null`. Lite doesn't read the clock; `criticalPathMinutes` gives the time.
 - `criticalPathMinutes`: `null` unless every council agent that ran has `durationMs`. Otherwise add up the slowest reviewer (or, when sequential, all the reviewers), the slowest debate agent, the judge and the appeal, for those the run had; with a baseline, take the larger of that sum and the baseline's own duration. Give it in minutes to one decimal place. The check doesn't count, since it runs after the council.
+- `severityChanges`: for judged, the list from section 7, one entry per merged finding whose final severity differs from any reviewer's: its citation (by its label in the judge's merged list), each reviewer's severity, the judge's, and the judge's reason or `null`; empty if none differ, and `null` without a judge.
 - `notes`: one line, no secrets, at most 400 characters.
 
 If you logged a deviation while doing this section, tell the user. When the user later makes the call on appealed findings, update those items.

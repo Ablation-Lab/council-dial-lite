@@ -62,11 +62,11 @@ The first time, Claude Code shows the marketplace it found and asks you to confi
 ## How it works
 
 1. **Choose.** Specialised or generalist reviewers; judged (with an appeal), pooled or consensus combining; optional debate, sequential and baseline runs. Presets: Standard (6 agents), Quick (4) and Thorough (10), each counting the final check.
-2. **Plan.** Claude builds each agent's brief from the templates in the skill's `briefs/` folder, word for word, saves the briefs, and starts the run's `run.json`.
+2. **Plan.** Claude builds each agent's brief from the templates in the skill's `briefs/` folder, word for word, saves the briefs, and starts the run's `run.json`. Anything you want left out, such as a folder of sample data, goes in the one-line description of what's reviewed, because that's what every brief gets. Claude adds nothing else to an agent's prompt, and logs any departure with its exact text.
 3. **Run.** Claude starts the agents as subagents. Each one saves its own report to the run's `reports/` folder and is told to open nothing else in the Lite folder; if one replies without saving, Claude saves its reply and says so. Claude compares each saved report with the agent's reply, and checks again that no saved report has changed before passing reports on. Judges, appeals and checks are never told which model or effort level produced a finding, or given the run's record.
 4. **Summarise.** Claude copies the findings, word for word, into `summary.txt`.
 5. **Check.** A fresh agent compares the summary with the reports and lists each finding that's missing, changed or has no source. Claude shows you the list and fixes the summary.
-6. **Log.** Claude records the counts, each agent's tokens, tool uses and time as Claude Code reported them, the check's counts, and anything Claude did differently from the skill's instructions in `run.json`. Later rechecks of fixes go in the same file.
+6. **Log.** Claude records the counts, each agent's tokens, tool uses and time as Claude Code reported them (wall-clock time, which in Manual mode includes any wait for your approval of a permission prompt, so it isn't pure model time), every finding whose severity the judge set differently from a reviewer's, up or down, the check's counts, and anything Claude did differently from the skill's instructions in `run.json`. Later rechecks of fixes go in the same file.
 
 ## Permission prompts
 
