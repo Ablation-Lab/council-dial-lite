@@ -72,6 +72,8 @@ In Claude Code's default (Manual) mode, every file write asks for your approval:
   The rule lets any agent in the session write anywhere under `reviews/lite/`, earlier runs included. That's why Claude compares each saved report with the agent's reply and stops if one changes, but an agent misled by the material could still edit an earlier run's files.
 - **Accept edits:** press `Shift+Tab` from Manual mode to switch to accept-edits mode before the run (or start Claude Code with `--permission-mode acceptEdits`). Claude Code then accepts file edits, and common file commands such as `mkdir`, `mv` and `rm`, inside your working directory without asking, for the whole session and not only the reviews; subagents run in the same mode. Since the agents read material that may contain instructions, this lets a misled agent change other files in your project without asking, so prefer the rule above.
 
+Claude also reads Lite's brief templates from the plugin's own folder, which is outside your project, so Claude Code can ask before those reads too. A session that can't ask, such as `claude -p`, refuses them and the run stops; a `Read` allow rule for that folder fixes it. Whether an installed copy asks in an interactive session hasn't been tested yet.
+
 Lite doesn't change your settings; add the rule yourself if you want it. If you deny an agent's prompt, Claude saves that agent's report itself (which asks you again in Manual mode) and marks it in `run.json` as saved by the main session.
 
 ## What it reads and writes
@@ -84,6 +86,18 @@ Lite doesn't change your settings; add the rule yourself if you want it. If you 
 
 - **Claude Code:** with subagents (the Agent tool) and file tools. This is where it was written to run.
 - **Cowork and claude.ai chat:** not tested. A council needs a tool that starts subagents and tools that read and write files in your project. Anthropic's docs don't say which chat or Cowork sessions have those, so whether a council runs there is untested.
+
+## Tested
+
+One Standard council (6 agents, with the subagents on Sonnet) ran on a small sample module on 8 November 2026, in Claude Code 2.1.319 on Windows 11. It ran headless (`claude -p`), with Lite loaded with `--plugin-dir` and two rules in the scratch project's untracked `.claude/settings.local.json`: `Edit(/reviews/lite/**)`, and a `Read` rule for Lite's folder. What it showed:
+
+- The headless session waited for all six background agents and finished the run.
+- The rule applied: every agent's save with the Write tool went through without a prompt. Four agents first tried to save with shell commands, which were refused, because a background agent can't ask in a headless session; they then used the Write tool. Lite now tells agents to save with the Write tool.
+- Two of the six saved files differed from the agent's reply: one dropped its Markdown formatting, and one added a line saying where it had saved the file and differed in its layout. Claude caught both and used the replies, as SKILL.md says.
+- The check found all 9 findings in the summary copied exactly: 9 MATCHES, and no CHANGED, NO SOURCE or LEFT OUT.
+- The agents used 207,823 tokens in all, from about 30,000 to 43,000 each, and the critical path took 2.1 minutes.
+
+Not tested yet: an interactive session, an installed copy (rather than `--plugin-dir`), Cowork and chat.
 
 ## Privacy
 
