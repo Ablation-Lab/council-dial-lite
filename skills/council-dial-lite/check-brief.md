@@ -21,7 +21,7 @@ Each finding in the summary has a heading that cites the report or reports it co
 4. Don't judge whether any finding is right, and don't add findings of your own.
 End with a count: findings in the summary, MATCHES, CHANGED, NO SOURCE, and LEFT OUT. No other text.
 
-Don't change anything. The only file you may write is your own report, where the first and last lines of this message say.
+Don't change or write anything; reply with your report.
 ```
 
 ## rule-judged
