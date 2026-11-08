@@ -2,6 +2,8 @@
 
 Council Dial Lite only. After a council, Claude writes the run's summary by copying findings from the agents' reports. A fresh check agent then gets this brief and compares the summary with those reports. The check doesn't judge whether the findings are right, only whether the summary reproduces them.
 
+Step 4, the count-line check, was added in Lite 1.5.0, after a run where the appeal's closing count said "13 checked" but it gave 14 verdicts, and the check agent repeated the 13. Runs before 1.5.0 have no `countMismatch` count.
+
 `{{rule}}` is the `rule-` text below for the run's combine method (`rule-judged`, `rule-pooled` or `rule-consensus`). If the run's appeal ran, a space and `rule-appeal` follow it, and if the run had a baseline, a space and `rule-baseline` follow that. In a run with brief version 3, use `rule-judged-v3` and `rule-appeal-v3` in place of `rule-judged` and `rule-appeal`: version 3's judge ranks every finding it didn't throw out, and its appeal also checks severities.
 
 ## brief
@@ -18,8 +20,9 @@ Each finding in the summary has a heading that cites the report or reports it co
 1. For each finding in the summary, find it in the report it cites first, and mark it MATCHES (the text is the same, word for word), CHANGED (quote the words that differ), or NO SOURCE (the report it cites has no such finding).
 2. List each finding the summary must include but doesn't, as LEFT OUT, with its report file and number.
 3. For each finding, check that the severity, title, file and line in the summary are the ones its report gives; a difference counts as CHANGED.
-4. Don't judge whether any finding is right, and don't add findings of your own.
-End with a count: findings in the summary, MATCHES, CHANGED, NO SOURCE, and LEFT OUT. No other text.
+4. For each report file, check every count it gives of items listed in that same report, such as a closing line "Severity findings: 13 checked" against the severity verdicts it gives, by counting those items yourself. Skip a count of things the report doesn't list itself. List each count that differs as COUNT MISMATCH: the report file, the count's words quoted, and the number of items it lists. Whenever you say how many items a report has, give the number you counted, not the report's own.
+5. Don't judge whether any finding is right, and don't add findings of your own.
+End with a count: findings in the summary, MATCHES, CHANGED, NO SOURCE, LEFT OUT and COUNT MISMATCH. No other text.
 
 Don't change or write anything; reply with your report.
 ```
