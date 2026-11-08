@@ -13,7 +13,7 @@ The report files and the summary file are listed after this brief. Each report w
 
 The summary must include: {{rule}}
 
-Each finding in the summary has a heading that cites the report or reports it comes from, such as reviewer-2/3 for finding 3 in reviewer-2.txt. Where a heading cites several reports joined by =, the text is copied from the first, and the finding counts as included for each of them.
+Each finding in the summary has a heading that cites the report or reports it comes from, such as reviewer-2/3 for finding 3 in reviewer-2.txt. Where a heading cites several reports joined by =, the text is copied from the first, and the finding counts as included for each of them. A line right after a heading that only says how many reviewers raised the finding isn't part of the finding. In a report, a finding runs from the line that begins it to just before the line that begins the next finding in the same list, or, for the last one, to just before the first heading or section label after it; blank lines at its end don't count.
 
 1. For each finding in the summary, find it in the report it cites first, and mark it MATCHES (the text is the same, word for word), CHANGED (quote the words that differ), or NO SOURCE (the report it cites has no such finding).
 2. List each finding the summary must include but doesn't, as LEFT OUT, with its report file and number.
@@ -21,7 +21,7 @@ Each finding in the summary has a heading that cites the report or reports it co
 4. Don't judge whether any finding is right, and don't add findings of your own.
 End with a count: findings in the summary, MATCHES, CHANGED, NO SOURCE, and LEFT OUT. No other text.
 
-Don't change anything. The only file you may write is your own report, where the line after the file list says.
+Don't change anything. The only file you may write is your own report, where the first and last lines of this message say.
 ```
 
 ## rule-judged
