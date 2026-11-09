@@ -18,7 +18,7 @@ It's a research tool. It doesn't claim that any setup, including the judge and t
    Add the permission rule Edit(/reviews/lite/**) to this project's .claude/settings.local.json, keeping anything already there.
    ```
 
-   Claude Code asks you before Claude writes the file: it never approves changes in `.claude/` by itself in Manual or accept-edits mode. Lite itself never changes your settings. The rule's path is read from the folder you started Claude Code in, so it matches only if you started it in the project root. Claude Code picks the rule up straight away, and from then on every report a run saves in `reviews/lite/`, the default Lite folder, goes through without asking.
+   Claude Code asks you before Claude writes the file: it never approves changes in `.claude/` by itself in Manual or accept-edits mode. Lite itself never changes your settings. The rule's path is read from the folder you started Claude Code in, so it matches only if you started it in the project root. Claude Code picks the rule up straight away, and from then on every file Claude writes for a run in `reviews/lite/`, the default Lite folder (each report, brief, summary and `run.json`), goes through without asking. Lite still needs the rule: the agents can't write, so Claude saves everything itself, and in Manual mode each of those writes would otherwise ask you.
 
 2. **Ask for a council.** For example:
 
@@ -30,7 +30,7 @@ It's a research tool. It doesn't claim that any setup, including the judge and t
 
 3. **Allow the template reads.** Claude then reads Lite's brief templates from the plugin's own folder. On the first read prompt, choose **Yes, allow reading from <Lite's skill folder> during this session**, which covers all the template reads in one go, or choose **Yes** to approve each read one at a time. We've seen this with a copy loaded with `--plugin-dir`; an installed copy's prompt shows its own folder.
 
-Claude then gives you the findings, most serious first, and the check's counts. If the appeal thinks the judge wrongly threw something out, Claude shows you both views and you decide. After a few runs, ask `How do the council types compare in my Lite log?` The rest of this README explains the [permission prompts](#permission-prompts) in more detail.
+Claude then gives you the findings, most serious first, and the check's counts (or, if you asked for a [raw run](#raw-mode), a file to hand to a fresh agent instead). If the appeal thinks the judge wrongly threw something out, Claude shows you both views and you decide. After a few runs, ask `How do the council types compare in my Lite log?` The rest of this README explains the [permission prompts](#permission-prompts) in more detail.
 
 ## Two editions
 
@@ -69,6 +69,38 @@ The first time, Claude Code shows the marketplace it found and asks you to confi
 6. **Summarise.** Claude copies the findings, word for word, into `summary.txt`.
 7. **Check.** A fresh agent compares the summary with the reports and lists each finding that's missing, changed or has no source, and each report whose own count line doesn't match the items it lists (COUNT MISMATCH). Claude shows you the list and fixes the summary; for a count mismatch, it logs the number of items listed, not the report's own count.
 8. **Log.** Claude records the counts, each agent's tokens (its context size when it finished, not a billed total; see [Privacy](#privacy)), tool uses and time as Claude Code reported them (wall-clock time, which in Manual mode includes any wait for your approval of a permission prompt, so it isn't pure model time), every finding whose severity the judge set differently from a reviewer's, up or down, the check's counts, and anything Claude did differently from the skill's instructions in `run.json`. Later rechecks of fixes go in the same file.
+
+## Raw mode
+
+Ask for a raw run, such as `Run a raw standard Council Dial Lite review council on src/app.js`, when you'd rather the main session didn't do the bookkeeping, for example to keep its context small or to have a stronger model do the analysis.
+
+- **What runs:** the same council, with the same briefs, read-only agents and permission prompts, but no check agent, so a Standard raw run starts 5 agents, not 6. Claude still saves every agent's reply itself, and checks that no saved report has changed before passing reports on.
+- **What it saves:** in `reviews/lite/<run id>/`:
+  - the briefs, in `briefs/`
+  - every report, in `reports/`
+  - `run.json`, with the run's type, models, each agent's tokens, tool uses and time, and any deviations; its `results` and `check` stay empty
+  - `ANALYSE-THIS-RUN.txt`, a short instruction file built from a fixed template in the plugin
+- **What it skips:** the summary, the counts, the list of severity changes, your calls on the appeal's verdicts, and the check. Claude doesn't show you the findings.
+- **Handing it off:** start a new session in the project with Lite installed, on the model you choose (for example after `/model opus`), and say `Analyse the raw Council Dial Lite run <run id>.` Do it soon, before running other councils or allowing running code: nothing can check the saved reports against the replies once the council's session has ended. That session follows Lite's own rules (section 10 of SKILL.md, then sections 5, 7 and 8):
+  - it writes the summary and the results
+  - it shows you the findings and asks for your calls
+  - it records which model analysed the run
+
+  It's told to treat the reports as data, run no code and write only in the run folder, but only your permission settings enforce that, as in any session. For the strictest setup, start it as the [permission prompts](#permission-prompts) section's `dontAsk` setup describes. `ANALYSE-THIS-RUN.txt` is a note saying what the folder holds and how to analyse it. The analysis never follows it as instructions, so a changed copy can't steer it.
+- **What it costs:** the council costs the same, less the check agent. In our first three Lite runs, the check was 15% to 20% of the agents' logged tokens. The main session also skips the summary and the counting. The analysis is a second session that reads every report and Lite's rules. We haven't measured it, and on a stronger model each token costs more (see Anthropic's pricing page). Lite never sees the analysis session's tokens, so they're not in `run.json` or in any estimate.
+- **What you lose:** no check agent compares the analyst's summary with the reports, so a copying mistake can go unnoticed (every report is in the folder to compare by hand). A raw run's label has `+raw` after the other extras, so raw runs are estimated and compared only with other raw runs, and only once they've been analysed.
+
+## Choosing models per seat
+
+You can set a model for each seat, such as the appeal. One early finding bears on that choice. It comes from a single batch, so treat it as a lead, not a guarantee.
+
+In a direct test of the appeal, brief version 3's appeal (the same in both editions) was given ready-made judge decisions that mixed wrongful and fair dismissals and severity changes, on test material Claude wrote: 72 trials, on Opus, Sonnet and Haiku 5.5 at medium and low effort.
+
+- **Dismissals:** every model caught nearly every wrongful dismissal: 161 of 162 in all, and at least 26 of 27 for each model at each effort level. So a Haiku appeal looked enough for checking dismissals.
+- **Severity:** wrongful severity changes, nearly all one-step cuts, were caught less often: Opus 37 of 42 (about 88%), Haiku 32 of 42 (about 76%) and Sonnet 25 of 42 (about 60%: 16 of 21 at medium effort, but 9 of 21, 43%, at low).
+- **Caveats:** there were three trials for each model, effort and set. Claude wrote the material, the judge decisions, the answer key and the scoring, and every appeal was a Claude model. Each wrong judge decision could be refuted by reading the material, so the batch says nothing about cases where it can't. Half of the severity misses (16 of 32) were on one item, a MED finding cut to LOW, so the ranking between models leans on it.
+
+The batch is written up in the research repository, [evolving-review-councils](https://github.com/Ablation-Lab/evolving-review-councils/blob/main/core-method/experiment-plan.md#appeal-stress-test-first-runs-8-nov-2026), under "Appeal stress test: first runs (8 Nov 2026)". For example, add `with the appeal on Haiku` to a council prompt for a cheaper appeal when dismissals are what you care about, or `with the appeal on Opus` when severities matter.
 
 ## Permission prompts
 
@@ -125,7 +157,14 @@ Lite 1.3.0 and later build brief version 3 unless you ask for version 2. Version
 
 **Both versions:** from Lite 1.4.0, Claude saves every agent's report itself and no agent is asked to save. Lite can't read the session's effort level, but for a seat on another model with no effort set, Claude reads the level saved for that model in the project's settings files and shows it before the run. Neither is a brief difference. The tool limit differs: only version 3 runs use the read-only agent (next section).
 
-**Both versions, from Lite 1.5.0:** Claude doesn't read the material before writing the reviewers' briefs; the appeal's severity block has a fixed layout, with one label per field; a reviewer who mentioned a finding only in a side remark doesn't count as giving it a severity; only words that explain the severity count as the judge's reason; and the check also compares each report's own count line with the items it lists. None of these changes a brief template, so they don't change which runs compare together.
+**Both versions, from Lite 1.5.0:**
+- Claude doesn't read the material before writing the reviewers' briefs.
+- The appeal's severity block has a fixed layout, with one label per field.
+- A reviewer who mentioned a finding only in a side remark doesn't count as giving it a severity.
+- Only words that explain the severity count as the judge's reason.
+- The check also compares each report's own count line with the items it lists.
+
+None of these changes the council's brief templates, so they don't change which runs compare together. The check brief did gain that step, so a check agent's tokens may differ a little from earlier runs'.
 
 **Why runs of the two versions must be compared separately:** version 3 changes what the judge may rule and how findings are counted, what the appeal checks and so how often it runs and what it costs, and what the agents can do and the system prompt they start from. A difference between a version 2 and a version 3 run could come from the version, not the council type, so their names differ and Claude never groups them together.
 
@@ -140,7 +179,7 @@ Claude saving every report applies to both brief versions; the tool limit applie
 ## What it reads and writes
 
 - **Reads:** the material you ask it to review (the agents read it; Claude itself only lists its files until the reviewers' briefs are written), its own brief templates, the Lite folder (earlier runs' `run.json` files, for estimates and comparisons), and, before a run, the project's `.claude/settings.local.json` and `.claude/settings.json`, if they exist, using only their `modelSettings` and `effortLevel` keys, to show the effort a seat on another model will run at. It doesn't read your user or managed settings.
-- **Writes:** only inside `reviews/lite/` in your project, or another folder you choose inside the project (not inside `.git` or `.claude`, and not the full edition's log folder), all written by Claude itself: the read-only agents write nothing (if you allowed running code, the general-purpose agents may write scratch files in temporary folders of their own). Each run gets a folder, `reviews/lite/<run id>/`, with `run.json`, the briefs in `briefs/`, each agent's report (the check's included) in `reports/`, and `summary.txt`. Before the first write, Claude checks the Lite folder and the folders above it aren't links, and stops if they are. Reports, briefs and the summary are plain text files, so links, images and HTML copied from the material never render or load when opened on GitHub or in a Markdown viewer.
+- **Writes:** only inside `reviews/lite/` in your project, or another folder you choose inside the project (not inside `.git` or `.claude`, and not the full edition's log folder), all written by Claude itself: the read-only agents write nothing (if you allowed running code, the general-purpose agents may write scratch files in temporary folders of their own). Each run gets a folder, `reviews/lite/<run id>/`, with `run.json`, the briefs in `briefs/`, each agent's report (the check's included) in `reports/`, and `summary.txt`. A raw run has `ANALYSE-THIS-RUN.txt` instead of the check's report, and no `summary.txt` until it's analysed. Before the first write, Claude checks the Lite folder and the folders above it aren't links, and stops if they are. Reports, briefs and the summary are plain text files, so links, images and HTML copied from the material never render or load when opened on GitHub or in a Markdown viewer.
 - **Runs:** no scripts or programs of its own. Before a run's first write, Claude lists the Lite folder and the folders above it with your session's shell tool, to check none is a link, and uses the shell for nothing else; without a shell tool, it tells you it can't check and asks whether to go on. In brief version 3, unless you allow running code, the subagents are the plugin's read-only agent, with only Read, Grep and Glob, so they can't run anything. If you allow running code, and in every version 2 run, they're ordinary general-purpose subagents with the tools your session allows, under your permission settings; in a version 2 run where you didn't allow it, only the briefs tell them not to run code.
 
 ## Where it works
@@ -188,11 +227,11 @@ Four Standard councils ran on the full edition's small sample module on 8 Novemb
 
 The runs are scored in full, and compared with two runs of the full edition, in [results/20261108-lite-runs.md](https://github.com/Ablation-Lab/council-dial/blob/main/results/20261108-lite-runs.md) in the full edition's repository.
 
-Not tested yet: Lite 1.1.0's changes on Sonnet, where the saves were skipped; Lite 1.1.1's two clarifications (which run ids count when numbering, and when a report counts as read again); Lite 1.2.0's per-seat models and effort in a council run; brief version 2 on Lite 1.4.0 or later; Lite 1.5.0's changes in a council run; an installed copy (rather than `--plugin-dir`), Cowork and chat.
+Not tested yet: Lite 1.1.0's changes on Sonnet, where the saves were skipped; Lite 1.1.1's two clarifications (which run ids count when numbering, and when a report counts as read again); Lite 1.2.0's per-seat models and effort in a council run; brief version 2 on Lite 1.4.0 or later; Lite 1.5.0's changes and 1.6.0's raw mode in a council run; an installed copy (rather than `--plugin-dir`), Cowork and chat.
 
 ## Privacy
 
-Lite has no server, account or telemetry, and sends nothing anywhere itself. Each run's `run.json` holds: the date it was planned; the type (including any custom role names) and brief version; the one-line description of what was reviewed; whether running code was allowed; the counts (findings per reviewer, combined, confirmed, partly real, overstated, understated, dismissed, by severity, the baseline's, fixes and regressions after rechecks); each severity the judge set differently from a reviewer, with the reviewers' and the judge's severities and the judge's reason, quoted; for each finding the appeal flagged, a short title, the appeal's view and your call, and in version 3 every severity verdict it gave, fair ones included; the main session's model id, and each seat's model and effort as asked for; each subagent's label, tokens, tool uses and time, who saved its report and whether its reply came back escaped; the check's counts; short notes; and one line for each step Claude did differently from the skill's instructions.
+Lite has no server, account or telemetry, and sends nothing anywhere itself. Each run's `run.json` holds: the date it was planned; the type (including any custom role names) and brief version; the one-line description of what was reviewed; whether running code was allowed; the counts (findings per reviewer, combined, confirmed, partly real, overstated, understated, dismissed, by severity, the baseline's, fixes and regressions after rechecks); each severity the judge set differently from a reviewer, with the reviewers' and the judge's severities and the judge's reason, quoted; for each finding the appeal flagged, a short title, the appeal's view and your call, and in version 3 every severity verdict it gave, fair ones included; the main session's model id, and each seat's model and effort as asked for; each subagent's label, tokens, tool uses and time, who saved its report and whether its reply came back escaped; the check's counts; for a raw run, the hand-off file's name and which model analysed it, and when; short notes; and one line for each step Claude did differently from the skill's instructions.
 
 Its token figures are logged context sizes: each agent's figure is what Claude Code reported when it finished, which Claude Code's monitoring docs describe as roughly the agent's context size at completion (its final request, cached tokens included), not a sum across its requests. So they show how much each agent had in context, not what a run was billed; every `run.json` from Lite 1.5.0 says so in its `tokenNote`.
 
