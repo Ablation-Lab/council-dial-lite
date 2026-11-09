@@ -2,7 +2,7 @@
 
 Council Dial Lite only. After a council, Claude writes the run's summary by copying findings from the agents' reports. A fresh check agent then gets this brief and compares the summary with those reports. The check doesn't judge whether the findings are right, only whether the summary reproduces them.
 
-Step 4, the count-line check, was added in Lite 1.5.0, after a run where the appeal's closing count said "13 checked" but it gave 14 verdicts, and the check agent repeated the 13. Runs before 1.5.0 have no `countMismatch` count.
+From Lite 1.7.0, the summary's headings cite findings with the run id, such as `lite-20261109-01/reviewer-2/3`, and the brief's example says so. Step 4, the count-line check, was added in Lite 1.5.0, after a run where the appeal's closing count said "13 checked" but it gave 14 verdicts, and the check agent repeated the 13. Runs before 1.5.0 have no `countMismatch` count.
 
 `{{rule}}` is the `rule-` text below for the run's combine method (`rule-judged`, `rule-pooled` or `rule-consensus`). If the run's appeal ran, a space and `rule-appeal` follow it, and if the run had a baseline, a space and `rule-baseline` follow that. In a run with brief version 3, use `rule-judged-v3` and `rule-appeal-v3` in place of `rule-judged` and `rule-appeal`: version 3's judge ranks every finding it didn't throw out, and its appeal also checks severities.
 
@@ -15,7 +15,7 @@ The report files and the summary file are listed after this brief. Each report w
 
 The summary must include: {{rule}}
 
-Each finding in the summary has a heading that cites the report or reports it comes from, such as reviewer-2/3 for finding 3 in reviewer-2.txt. Where a heading cites several reports joined by =, the text is copied from the first, and the finding counts as included for each of them. A line right after a heading that only says how many reviewers raised the finding isn't part of the finding. In a report, a finding runs from the line that begins it to just before the line that begins the next finding in the same list, or, for the last one, to just before the first heading or section label after it; blank lines at its end don't count.
+Each finding in the summary has a heading that cites the report or reports it comes from, such as lite-20261109-01/reviewer-2/3 for finding 3 in reviewer-2.txt (the part before the first / is the run id). Where a heading cites several reports joined by =, the text is copied from the first, and the finding counts as included for each of them. A line right after a heading that only says how many reviewers raised the finding isn't part of the finding. In a report, a finding runs from the line that begins it to just before the line that begins the next finding in the same list, or, for the last one, to just before the first heading or section label after it; blank lines at its end don't count.
 
 1. For each finding in the summary, find it in the report it cites first, and mark it MATCHES (the text is the same, word for word), CHANGED (quote the words that differ), or NO SOURCE (the report it cites has no such finding).
 2. List each finding the summary must include but doesn't, as LEFT OUT, with its report file and number.
