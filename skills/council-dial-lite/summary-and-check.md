@@ -1,0 +1,46 @@
+# Council Dial Lite: summary and check
+
+Sections 5 and 6 of the Council Dial Lite skill. The ground rules in SKILL.md apply here too, and SKILL.md says which file holds each section.
+
+## 5. Write the summary
+
+In the council session of a raw run, skip sections 5 to 8 and go to section 10. (An analyst of a raw run does sections 5, 7 and 8, as section 10 says.)
+
+Read the saved reports again first, as section 4 says (a read-back counts only as section 4 allows). Write `<run folder>/summary.txt`. Its first line is `Run <run id>.` (not the label, which names the model, since the check agent reads this file).
+
+**Which findings it holds.** The check brief, `check-brief.md`, has a `rule-` text for each combine method. Each one says, in a sentence, which findings the summary must hold and how duplicates are shown, and the check agent checks the summary against exactly that sentence. So the summary holds exactly the findings the run's `rule-` texts name, and no others:
+- the one for its combine method: `rule-judged` (in brief version 3, `rule-judged-v3`), `rule-pooled` or `rule-consensus`;
+- plus `rule-appeal` (in version 3, `rule-appeal-v3`) if the appeal ran;
+- plus `rule-baseline` if there was a baseline.
+
+**An overview of your own.** If you'll give the user an overview (section 7), write it now, after the summary and before the check, to `<run folder>/overview.txt`: plain text, under the heading `Overview (Claude's own words, not the council's findings)`, grouping the findings into issues and citing them. Like the summary, it never names a model, an effort level or the label, because the check agent reads it. Keep your own verdicts (HOLDS and so on) out of it; they go in `ownChecks`. The check agent then checks every fact it states against the reports (section 6). Your report's overview is that text, unchanged apart from any fix the check calls for, and `results.notes` may state what a finding says only if `overview.txt` already states it (counts and the check's results are fine). In a raw run, the analyst writes the overview the same way, but no check agent checks it: say so where you give it.
+
+For example, `rule-pooled` says: every finding in every review report, and every new finding in the debate reports if there are any, with a finding that appears word for word in more than one report included once, under a heading that cites each report it's in.
+
+**Order.** For judged, list the findings in the judge's ranked order. Otherwise, list them in plan order of their (first) report, then by finding number.
+
+Give every section the rules call for its own heading line, exactly as below, in this order and with no others, and write `None.` under any that has no findings:
+- judged: `## Findings: the judge's final ranked list`
+- pooled: `## Findings: every finding`
+- consensus: `## Findings: raised by most reviewers`, then `## Minority findings`
+- if the appeal ran: `## Appeal: WRONGLY DISMISSED or UNSURE` (brief version 2), or `## Appeal: WRONGLY DISMISSED, TOO LOW, TOO HIGH or UNSURE` (version 3)
+- with a baseline: `## Baseline reviewer's findings`
+
+For each finding, write a heading line `### ` and its citation (section 4), such as `### lite-20261109-01/reviewer-2/6`, and then the finding copied from the reply exactly: same words, severity, title, file and line, evidence, fix and confidence. A finding starts at the line that begins it (its number, or for the appeal, the dismissed finding's label) and ends just before the line that begins the next finding in the same list. The last finding in a list ends just before the first heading or section label after it (such as `CHECKED AND FOUND SOUND`, `COUNTS` or `NOTES:`), or at the end of the reply. Blank lines, code blocks and numbered steps inside a finding are part of it; blank lines at its end aren't. In a table, a finding is its row. Add nothing inside the copied text. Where the same finding is included from several reports (pooled duplicates, or consensus), the heading cites each of them joined by ` = `, in plan order, such as `### lite-20261109-01/reviewer-1/2 = lite-20261109-01/reviewer-3/1`, and the text is copied from the first. For consensus, add a line after the heading saying how many reviewers raised it.
+
+## 6. Check the summary
+
+Before starting it, read the saved reports again as section 4 says. Then start one fresh check agent, with its prompt built as section 4 says for `reports/check.txt`: no material lines, and in place of reports, its file list:
+- a line `Report files:`, then a line `- <agent file without .txt>: <path>` for each report the check's `{{rule}}` names, whether or not the summary uses it (for judged, the judge's, and the appeal's and the baseline's if they ran; for pooled and consensus, every review and debate report, and the baseline's);
+- for judged, a line `Count files:`, then a line `- <agent file without .txt>: <path>` for each saved reviewer's and debate agent's report, so the check also checks their count lines (pooled and consensus have every report under `Report files:` already, so leave this out);
+- a line `Summary file:` and a line `- <path of summary.txt>`;
+- if you wrote `overview.txt`, a line `Overview file:` and a line `- <its path>`, then a line `Overview sources:` and a line `- <agent file without .txt>: <path>` for every report in the run, the check's own aside;
+- a line `Brief files:`, then for each saved brief except the check's own, a line saying how you built it: `- <brief file name>: <template file> "<block>"`, then, for each placeholder in that block, `; <placeholder> = <template file> "<block>"`, with the placeholders inside that block in brackets after it, or `; <placeholder> = filled` for a value such as the description, a role or a number. For example: `- reviewer-1.txt: briefs/reviewer.md "brief"; {{lens}} = briefs/reviewer.md "council-everything" ({{k}} = filled; {{n}} = filled); {{what-to-review}} = briefs/v3/shared.md "what-to-review" ({{target}} = filled); {{rules}} = briefs/v3/shared.md "rules"; {{format}} = briefs/v3/shared.md "format"`. Above that line, put two lines: `Brief folder: <full path of the run folder's briefs/>`, then `Template folder: <full path of the skill folder>`. Brief file names are relative to the first, and template paths to the second.
+
+Don't give it `run.json`, anything about models or effort, or the description of what's reviewed except as it appears in the briefs. Its template reads are outside the project, so they can ask the user for permission unless the user allowed reading the skill folder for the session.
+
+When it finishes, save its reply to `reports/check.txt` and read it back as section 4 says. Nothing may use it until you've seen that read-back match: record none of its counts, and make no change it calls for (to `overview.txt`, `summary.txt` or anything else), in the batch that holds the save or the read-back, or any earlier one. Do those in a later batch. Then record its counts in `run.json` as `"check": {"findings": n, "matches": n, "changed": n, "noSource": n, "leftOut": n, "countMismatch": n, "briefsMatch": n, "briefsDiffer": n, "briefsNotChecked": n, "overviewUnsupported": n}` (`overviewUnsupported` is `null` when there was no overview), and set each checked brief's `briefChecks[].checkAgent` to `matches`, `differs` or `not checked`. Then show the user every CHANGED, NO SOURCE, LEFT OUT, COUNT MISMATCH, BRIEF DIFFERS, BRIEF NOT CHECKED and OVERVIEW UNSUPPORTED item. For each OVERVIEW UNSUPPORTED claim, check it against the reports yourself: correct or remove it in `overview.txt`, or say the check was mistaken. Results aren't logged yet, so `results.notes` then follows the corrected text.
+- **For a BRIEF DIFFERS:** compare that saved brief with its templates yourself (reading it to check it is fine). If it does differ, say plainly that the saved copy doesn't match its template, and log it as a deviation. The check compares the saved copy, not the prompt as it was sent, so say that too. If it doesn't differ, say the check was mistaken.
+- **For a BRIEF NOT CHECKED:** the check couldn't read a template file, usually because reading the skill folder wasn't allowed for the session. Say so.
+- **For a COUNT MISMATCH:** this is a report whose own count (a closing count line, or a count such as "three problems:" inside a finding) says a different number from the items it lists; it needs no change to the summary, but wherever you log or report that number (such as the appeal's `severityReviewed`), use the number of items the report lists, and say so in `notes`.
+- **For a CHANGED, LEFT OUT or NO SOURCE:** fix each one in `summary.txt`: copy a CHANGED or LEFT OUT finding again from the reply, and correct the citation of a NO SOURCE one or, if it has no source, remove it. If copying again gives the same text, say the check was mistaken about it. You don't need to run the check again unless the user asks; say what you fixed.
