@@ -22,22 +22,28 @@ Each report goes in its own block, `<report from="<label>">` … `</report>`, wh
 - **debate:** for each seat, a debate agent gets every review report, with the one from its own seat marked `<report from="<label>" YOURS>`; start them together.
 - **combine:** for judged, start a fresh judge with every review report and debate response. For pooled or consensus there's no agent: you combine them in the summary (section 5).
 - **appeal:** in brief version 2, if the judge marked nothing NOT REAL, don't start it; say there was nothing to appeal. Otherwise give it each NOT REAL finding copied exactly from the judge's reply, with the judge's reasons, in one `<dismissed from="judge">` … `</dismissed>` block. Never give it the reviewers' reports, any other brief or the description of what's reviewed.
-- **appeal, brief version 3:** it checks dismissals and severities. Give it the NOT REAL findings in a `<dismissed from="judge">` block as above, and a `<severity from="judge">` … `</severity>` block with every finding the judge ruled OVERSTATED or UNDERSTATED and every other finding it kept at LOW, in the order of their numbers. Lay out each severity item exactly like this: these seven labels, in this order, each at the start of its own line and followed by one space, nothing else on any line, and one blank line between items.
+- **appeal, brief version 3:** it checks dismissals and severities. Give it the NOT REAL findings in a `<dismissed from="judge">` block as above, and a `<severity from="judge">` … `</severity>` block with every finding the judge ruled OVERSTATED or UNDERSTATED and every other finding it kept at LOW, in the order of their numbers. Lay out each severity item exactly like this: these seven labels, in this order, each at the start of its own line, with one blank line between items. Each of the first six is followed by one space and its value, with nothing else on the line; `Judge's ruling:` is alone on its line, and the ruling follows it in a fenced text block.
 
-  ```
+  `````
   Finding: M4
   Title: Mutable seen default skips files
   File and line: shelfkeep.py:112-122
   Claim: scan() mutable default seen=set() makes dupes and report skip files.
   Reviewer severities: correctness: HIGH; docs and policy accuracy: HIGH
   Judge's severity: MED
-  Judge's reason: "I rate it lower because only read-only reporting commands are affected."
-  ```
+  Judge's ruling:
+  ````text
+  **M4. Mutable seen default skips files**
+  - Raised by: correctness #2 (HIGH), docs and policy accuracy #1 (HIGH).
+  - Severities: correctness HIGH, docs and policy accuracy HIGH; mine MED. Only the read-only reporting commands are affected.
+  - Ruling: **OVERSTATED**.
+  ````
+  `````
 
   - `Finding:` the judge's number for it. `Title:` and `File and line:` copied exactly from its row in the judge's final ranked list, as the end of this item says. `Claim:` the judge's description of the finding in its merged list, copied exactly, up to but not including its list of sources; if it runs over several lines, join them with single spaces, changing nothing else. If the merged-list entry is only a heading (such as a bold `M4. <text>`) with no separate description, use the heading's text without its number (with the colon or full stop after it) and its bold or italic markers (`**`, `*`, `__`, `_`) or heading markers (`#`); keep code-span backticks, which are part of the text. In a ranked-list line, `File and line:` is its file locations, the part made of paths and line numbers before `Fix:`, without the brackets round it if it has them and without the full stop after it (`a.mjs:24, :29; README:7.` gives `a.mjs:24, :29; README:7`); `Title:` is the text between the number, severity and ruling and those locations, without the full stop, space or bracket that ends it, and a full stop inside it is kept. For example, from `1. **M4: MED, OVERSTATED.** Mutable seen default skips files. shelfkeep.py:112-122. Fix: …` or from `1. M4, MED, OVERSTATED. Mutable seen default skips files (shelfkeep.py:112-122). Fix: …`, `Title:` is `Mutable seen default skips files` and `File and line:` is `shelfkeep.py:112-122`. In a table, leave out only a full stop that ends a cell. When the bold markers wrap the number, severity, ruling and title together, as in `1. **M4, MED, OVERSTATED. Mutable seen default skips files.** shelfkeep.py:112-122. Fix: …`, `Title:` is the title without the closing `**` and without the full stop before it: `Mutable seen default skips files`.
   - `Reviewer severities:` every reviewer seat the judge lists as raising the finding, in plan order, as `<seat>: <severity>` (the seat's role, or `reviewer 2` for a generalist), separated by `; `. A seat the judge lists only for a side remark, with no severity of its own for this finding (or with one the judge says belongs to another finding), is shown as `<seat>: no severity (side remark)`. It doesn't count as giving a severity (section 7).
-  - `Judge's severity:` HIGH, MED or LOW, and nothing else (no ruling).
-  - `Judge's reason:` the judge's reason as section 7 defines it, copied exactly inside straight double quotes. If there is none: for OVERSTATED or UNDERSTATED, whose brief requires a reason line, the words `the judge gave no reason line` (its ruling may still explain itself elsewhere, such as in its check of the claim, but that isn't a reason line, and the appeal doesn't get the judge's report); for any other ruling, the words `no reason given`. Both without quotes.
+  - `Judge's severity:` HIGH, MED or LOW, and nothing else (the ruling goes under `Judge's ruling:`).
+  - `Judge's ruling:` the judge's whole ruling for this finding, copied exactly, in a fenced text block whose fence is longer than any run of backticks in it. The ruling is the finding's entry in the judge's merged list, from the line that starts it (its number, such as `**M4. …**` or `M4.`) up to just before the line that starts the next merged finding, or the first heading or section label after the list, with blank lines at its end left out; if the judge also rules on it in a list of its own (such as a list of rulings or severities, but not the final ranked list or the flagged fixes), add that entry after it, in the same block. Don't pick a reason out of it, and never say whether it has one: judges lay their rulings out differently in every run, so the appeal reads the ruling itself.
 
   Leave out a block that would be empty; if both would be, don't start it, and say there was nothing to check. Never put a model or effort in either block.
 
