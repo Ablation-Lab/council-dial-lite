@@ -11,6 +11,7 @@ From the final independent review before submission (Fable 5.2, on 2.1.1):
 - The `started` sequence, saving a report and reading it back, and the report's parts are numbered lists, with the same requirements. The read-back rule says why it matters, without mentioning Claude Code's own tool messages.
 - The icon is at `./icon.png`; the skill's and the plugin's descriptions are shorter; the test history and the directory's message moved here from the README.
 - Claude searches the project's settings files with Grep instead of reading them; tells you once, when it creates the Lite folder, that reports quote your material; treats a missing Lite folder as nothing to find; and names a role's files `reviewer-<k>` when the role has no Latin letter or digit.
+- If you change an appeal call after it's logged, Claude updates the item and records the earlier call in the run's `notes`, not as a deviation: deviations are only for Claude's own departures from the skill.
 - Smaller wording fixes, and a pointer from section 4 to section 10 for raw runs.
 
 It changes what agents see and adds a stop rule, so it's a new minor version; its labels end `(Lite 2.2.0)`.
