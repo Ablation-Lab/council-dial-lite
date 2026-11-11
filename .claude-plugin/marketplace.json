@@ -8,8 +8,8 @@
     {
       "name": "council-dial-lite",
       "source": "./",
-      "description": "The lighter, script-free edition of Council Dial. Runs a review council of Claude subagents the way you choose, with read-only agents by default. Claude saves each agent's report itself, copies the findings word for word into a summary a fresh agent checks, and logs each run. A council can flag an rm -rf that could delete the wrong data, as well as bugs, security issues and wrong docs, but may miss some; for research runs, use the full Council Dial: https://github.com/Ablation-Lab/council-dial.",
-      "version": "2.1.2",
+      "description": "The script-free edition of Council Dial, for Claude Code: a council of Claude subagents, read-only by default, reviews your code, docs or plan in the setup you choose, a fresh agent checks the findings were copied word for word, and each run is logged so you can compare setups. It can flag a destructive command, such as an rm -rf whose target could resolve to the wrong data, alongside bugs, security issues and wrong docs, though a council can still miss things.",
+      "version": "2.2.0",
       "category": "development"
     }
   ]
