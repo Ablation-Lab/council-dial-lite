@@ -2,9 +2,13 @@
 
 What changed in each version of Council Dial Lite, the test councils each version was checked with, and what they showed. The [README](README.md) describes the current version.
 
-## Planned
+## 2.2.3
 
-- **Bring SKILL.md under 4,500 tokens.** As loaded it's about 4,990 (see the README's maintainers' note), just inside the 5,000 Claude Code keeps after a compaction. Measured options: move most of "Log every deviation" (about 780 tokens) to `report-and-log.md`, leaving a short version, for about 4,240; moving "No instruction files in the Lite folder" (about 490) alone gives about 4,520, which isn't enough; both give about 3,750. A rule in a step file is read only when that file is.
+From the 2.2.2 installed-copy test (`lite-20261111-01`) and the re-measurement of SKILL.md:
+- SKILL.md is about 4,480 tokens as loaded, down from about 4,990, so it fits within the 5,000 Claude Code keeps after a compaction with about 500 to spare. "Log every deviation" keeps a short version in SKILL.md: log your own slips in `deviations` as soon as you notice, with the exact text of any prompt change, and what the user asked for and instructions from outside the skill in their own lists. The full rule moved word for word to section 7, in `report-and-log.md`, under "Logging deviations", with two references changed for its new place ("this file" became "SKILL.md", and "(above)" became "(SKILL.md's ground rules)"). Claude reads it before the deviation review. No other rule in SKILL.md changed.
+- **The judge's reason.** In the 2.2.2 run the judge wrote each OVERSTATED and UNDERSTATED reason on a line headed "Reason:", with the severities on the line before. No sentence in those lines named a severity, so by 2.2.1's rule all five (M2, M3, M4, M5 and M8) were logged as "the judge gave no reason line", and the appeal was told the same: it wrote of M5 that the judge had raised it "with no reason given", which wasn't true. Now a line headed `Reason:` (in any case, with or without bold) is the reason, quoted exactly: the first one if there are several, and not one that's empty or only states a severity. Without one, the earlier sentence test applies, and only if neither finds a reason is there none. The appeal's severity block takes the same reason.
+
+Its labels end `(Lite 2.2.3)`.
 
 ## 2.2.2
 
@@ -210,6 +214,16 @@ The research repository's [experiment plan](https://github.com/Ablation-Lab/evol
 - **The judge's reasons:** its OVERSTATED rulings on M6 and M9 gave bullet points that name no severity, so both were logged as "the judge gave no reason line", by 2.2.1's rule.
 - **Tokens and time:** 106,901 in all (context sizes); the critical path took 3.3 minutes.
 - **Still to fix:** nothing from the run itself.
+
+**Lite 2.2.2, interactive, one judged Standard council from an installed copy** (`lite-20261111-01`, in a fresh test folder), installed and set up the same way as the 2.2.1 run, with the same `CLAUDE.md` line:
+- **The installed copy:** Claude read the step files and templates from the cache's `…/cache/council-dial-lite-test/council-dial-lite/2.2.2/skills/council-dial-lite`.
+- **The check:** all 14 findings copied exactly, and every brief matched its template (5).
+- **The run:** the judge merged 22 reviewer findings (9, 6 and 7) into 15: 7 REAL, 1 PARTLY REAL, 4 OVERSTATED, 1 UNDERSTATED and 2 NOT REAL (3 HIGH, 2 MED, 10 LOW). The appeal upheld both dismissals and checked 10 severities, marking one TOO LOW (M3), whose call was still pending when the run's report was written.
+- **The `CLAUDE.md` line:** as in 2.2.1, Claude named it in the plan, left it out of every prompt and didn't carry it out; it went in `outsideInstructions`, and the report-file request in `userRequests`. The run logged no deviations.
+- **The judge's reasons:** all five OVERSTATED and UNDERSTATED rulings gave a line headed "Reason:" that named no severity, so by 2.2.1's rule all five were logged as "the judge gave no reason line", and the appeal's severity block said the same.
+- **Connector instructions:** every agent got the claude.ai Claude Docs connector's instructions after its first request, about 710 tokens each. The security reviewer and the judge mentioned them in their NOTES:.
+- **Tokens and time:** 109,580 in all (context sizes); the critical path took 3.6 minutes.
+- **Still to fix:** the judge's reason rule, changed in 2.2.3.
 
 ## Why only Lite is submitted
 
