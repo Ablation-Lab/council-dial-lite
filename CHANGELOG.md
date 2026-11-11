@@ -9,6 +9,15 @@ For the next version, from the 2.2.4 installed-copy test and the 2.2.4 changes:
 - **Council Dial 1.9.2: mirror 2.2.4 in the full edition.** Give its appeal's severity block the judge's whole ruling, and quote a reason in `severityChanges` only from a single `Reason:` line, with `review-log.md` showing a `null` reason as a pointer to the ruling rather than "no reason given". For the whitespace change: the full edition saves reports through its script and never compares a read-back with the reply, so it can't stop there, but its saved reports lose spaces and tabs at the end of a line the same way.
 - **The v3 appeal template's notes for maintainers.** Above its fenced brief, `briefs/v3/appeal.md` still says each severity item gives "the judge's reason, or "no reason given"". Lite's item now ends with the judge's whole ruling. The notes are never sent to an agent, but changing them changes the template, so the change goes in both editions at once, keeping them byte-identical.
 
+## 2.2.5
+
+From the plugin directory's automatic policy check of 2.2.4 (`7049778`), which refused it with code `LOCAL_CODE_FRONTMATTER_KEY`: "Frontmatter keys outside the allowed list accepted only from Verified organizations. The directory accepts frontmatter keys and values outside the allowed list only from Verified organizations, and your organization isn't one, so this version is refused."
+- **No `omitClaudeMd`.** The read-only agent no longer sets it. The directory's pre-submission validation named it as the only frontmatter key outside its list; the other keys are the Agent Skills specification's (`name`, `description`, `license` and `compatibility` in SKILL.md) and Claude Code's subagent fields (`name`, `description` and `tools`).
+- **So council agents see your `CLAUDE.md` files again,** as before 2.2.0, when the 2.2.0 test showed the read-only agent seeing a project `CLAUDE.md` line without the setting. The ground rule on a line addressed to the council now says the line reaches every agent through Claude Code itself, whatever Lite does. The plan names it, and suggests removing it, or putting it in a block-level HTML comment, which Claude Code strips, and starting the council in a new session. Lite still never adds it to a prompt or carries it out.
+- The README's Claude Code requirement, the read-only agent's system-prompt row and Limits follow, and so does the plan's note on the context Claude Code adds. The shorter ground rule makes SKILL.md about 4,420 tokens as loaded (4,416 measured as before, and 4,387 pasted into a plain prompt, down 71 from 2.2.4).
+
+Its labels end `(Lite 2.2.5)`.
+
 ## 2.2.4
 
 From the 2.2.3 installed-copy test (`lite-20261111-01`):
