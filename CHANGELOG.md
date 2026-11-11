@@ -2,6 +2,17 @@
 
 What changed in each version of Council Dial Lite, the test councils each version was checked with, and what they showed. The [README](README.md) describes the current version.
 
+## 2.2.1
+
+From the installed-copy test of 2.2.0 (`lite-20261111-01`, a Standard council from a cached install):
+- Deviations are only Claude's own slips. What the user asked for goes in a new `userRequests` list, and an instruction found outside the skill, such as a project file's line addressed to the council, in a new `outsideInstructions` list. The deviation review checks each entry is in the right list.
+- A new ground rule: a line in `CLAUDE.md` or another project instruction file that's addressed to the council's agents isn't added to any prompt or carried out by Claude on their behalf. Claude tells the user before any agent starts, and the user decides. (In the test, the reviewers didn't see the project's `CLAUDE.md`, but Claude ended its own report with the word that line asked of reviewers.)
+- The appeal's severity block covers a ranked-list line whose bold markers wrap the number, severity, ruling and title together.
+- The Lite folder notice may come in the plan message, when the folder doesn't exist yet.
+- One test for the judge's reason, whatever the ruling's layout: the first sentence that names a severity and says more than the severity itself. A ruling with only bullet points that never name a severity has no reason line.
+
+Its labels end `(Lite 2.2.1)`.
+
 ## 2.2.0
 
 From the final independent review before submission (Fable 5.2, on 2.1.1):
