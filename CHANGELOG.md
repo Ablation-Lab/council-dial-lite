@@ -2,6 +2,10 @@
 
 What changed in each version of Council Dial Lite, the test councils each version was checked with, and what they showed. The [README](README.md) describes the current version.
 
+## Planned
+
+- **Bring SKILL.md under 4,500 tokens.** As loaded it's about 4,990 (see the README's maintainers' note), just inside the 5,000 Claude Code keeps after a compaction. Measured options: move most of "Log every deviation" (about 780 tokens) to `report-and-log.md`, leaving a short version, for about 4,240; moving "No instruction files in the Lite folder" (about 490) alone gives about 4,520, which isn't enough; both give about 3,750. A rule in a step file is read only when that file is.
+
 ## 2.2.2
 
 From the second independent review before submission (Fable 5.2, on 2.2.1), its five MED findings and four README-only LOW ones:
