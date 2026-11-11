@@ -2,6 +2,13 @@
 
 What changed in each version of Council Dial Lite, the test councils each version was checked with, and what they showed. The [README](README.md) describes the current version.
 
+## Planned
+
+For the next version, from the 2.2.4 installed-copy test and the 2.2.4 changes:
+- **Titles from a ranked-list table.** In the 2.2.4 run the judge's ranked list was a table whose finding cell held the number and the title together (such as `M3. Non-ASCII letters dropped; empty slugs`). Section 4's table rule says only to leave out a full stop that ends a cell, so Claude left the `M<n>. ` out of `Title:` by analogy with the ranked-list rule and logged the rule as unclear. Say that `Title:` leaves out the number there too.
+- **Council Dial 1.9.2: mirror 2.2.4 in the full edition.** Give its appeal's severity block the judge's whole ruling, and quote a reason in `severityChanges` only from a single `Reason:` line, with `review-log.md` showing a `null` reason as a pointer to the ruling rather than "no reason given". For the whitespace change: the full edition saves reports through its script and never compares a read-back with the reply, so it can't stop there, but its saved reports lose spaces and tabs at the end of a line the same way.
+- **The v3 appeal template's notes for maintainers.** Above its fenced brief, `briefs/v3/appeal.md` still says each severity item gives "the judge's reason, or "no reason given"". Lite's item now ends with the judge's whole ruling. The notes are never sent to an agent, but changing them changes the template, so the change goes in both editions at once, keeping them byte-identical.
+
 ## 2.2.4
 
 From the 2.2.3 installed-copy test (`lite-20261111-01`):
@@ -235,6 +242,29 @@ The research repository's [experiment plan](https://github.com/Ablation-Lab/evol
 - **Connector instructions:** every agent got the claude.ai Claude Docs connector's instructions after its first request, about 710 tokens each. The security reviewer and the judge mentioned them in their NOTES:.
 - **Tokens and time:** 109,580 in all (context sizes); the critical path took 3.6 minutes.
 - **Still to fix:** the judge's reason rule, changed in 2.2.3.
+
+**Lite 2.2.3, interactive, one judged Standard council from an installed copy** (`lite-20261111-01`, in a fresh test folder), installed and set up the same way as the 2.2.2 run, with the same `CLAUDE.md` line:
+- **The installed copy:** Claude read the step files and templates from the cache's `…/cache/council-dial-lite-test/council-dial-lite/2.2.3/skills/council-dial-lite`.
+- **The read-back stop:** the correctness reviewer's reply had four lines holding only spaces, which the saved file had empty, so both read-backs differed from the reply and the run stopped after the review step. The user chose to go on with the saved copy, logged in `userRequests`. The `.as-received.txt` copy lost the same spaces.
+- **The check:** all 13 findings copied exactly, and every brief matched its template (5).
+- **The run:** the judge merged 21 reviewer findings (10, 4 and 7) into 12: 8 REAL, 2 PARTLY REAL, 1 OVERSTATED and 1 NOT REAL (3 HIGH, 3 MED, 6 LOW). The appeal upheld the dismissal and checked 5 severities, marking M6 TOO LOW, which the user changed to MED, and M11 UNSURE, which the user kept at LOW.
+- **The judge's reasons:** the judge wrote no "Reason:" line. M6's reason sat on its "Severities:" line, after its severity, so by 2.2.3's rule it was logged as "the judge gave no reason line", and the appeal wrote that "The judge gave no reason for LOW."
+- **The `CLAUDE.md` line:** as before, named in the plan, left out of every prompt and not carried out, in `outsideInstructions`. `userRequests` held the two real requests (the report file, and going on with the saved copy), but also the task itself: the standard council, and that nobody may run code.
+- **Deviations:** five. One was a skipped `run.json` read-back. Two were slips found in the deviation review (logged late), and one was the `.as-received.txt` copy losing the spaces (logged late). The last was an update to the requested report file after the user's calls (after review).
+- **Tokens and time:** 102,198 in all (context sizes); the critical path took 2.9 minutes.
+- **Still to fix:** the read-back rule, the judge's reason and `userRequests`, all changed in 2.2.4.
+
+**Lite 2.2.4, interactive, one judged Standard council from an installed copy** (`lite-20261111-01`, in a fresh test folder), installed from the commit with all of 2.2.4's changes and set up the same way, with the same `CLAUDE.md` line:
+- **The installed copy:** Claude read the step files and templates from the cache's `…/cache/council-dial-lite-test/council-dial-lite/2.2.4/skills/council-dial-lite`.
+- **Saving:** every read-back matched its reply, with `trailingWhitespaceLines` 0 for all six agents: no reply had a space or tab at the end of a line, so the new rule wasn't exercised. Four replies came back escaped and were turned back (4, 2, 3 and 1 entities).
+- **The check:** all 12 findings copied exactly, and every brief matched its template (5).
+- **The run:** the judge merged 23 reviewer findings (10, 6 and 7) into 12: 7 REAL, 2 PARTLY REAL and 3 OVERSTATED (2 HIGH, 3 MED, 7 LOW). Nothing was dismissed, so the appeal checked only severities: 8, all SEVERITY FAIR.
+- **The appeal's severity block:** each item ended with the judge's whole ruling, fenced (in the session transcript). This judge also gave a separate list of rulings, and each finding's entry there was added to its ruling.
+- **The judge's reasons:** three of the four severity changes were quoted from a single "Reason:" line. M2, a REAL ruling where one reviewer gave LOW, had none, so it says "see the judge's ruling" (`null`).
+- **The `CLAUDE.md` line and the lists:** as before, in `outsideInstructions` and not carried out. `userRequests` held only the report-file request.
+- **Deviations:** one. The judge's ranked list was a table whose finding cell held the number and the title together, and section 4's table rule doesn't say whether `Title:` keeps the `M<n>. `. Claude left it out by analogy with the ranked-list rule and logged the rule as unclear.
+- **Tokens and time:** 103,835 in all (context sizes); the critical path took 2.9 minutes.
+- **Still to fix:** the table-title rule (Planned).
 
 ## Why only Lite is submitted
 
