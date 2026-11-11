@@ -2,6 +2,14 @@
 
 What changed in each version of Council Dial Lite, the test councils each version was checked with, and what they showed. The [README](README.md) describes the current version.
 
+## 2.2.4
+
+From the 2.2.3 installed-copy test (`lite-20261111-01`):
+- **Spaces at the end of a line.** The correctness reviewer's reply had four lines holding only spaces. Claude's Write call carried them (the session transcript keeps the tool input as the model sent it), but the Write tool saved those lines empty, so both read-backs differed from the reply and the run stopped, although nothing in the report had changed. In Claude Code 2.1.322 the Write tool drops spaces and tabs at the end of every line, not only on lines that hold nothing else. A read-back now counts a difference only in spaces or tabs at the end of a line, including a line of only spaces or tabs, as a match, and records how many lines differed that way in the agent's `trailingWhitespaceLines`; any other difference, such as a blank line missing or spaces lost at the start of a line, still stops the run. The report to the user names every report where that number isn't 0.
+- The check agent's comparisons aren't affected: the summary and the saved reports are both saved with the Write tool, so they lose the same spaces, and a finding MATCHES when its words are the same; and no brief template has a space or tab at the end of a line, so a saved brief keeps every character of its template.
+
+Its labels end `(Lite 2.2.4)`.
+
 ## 2.2.3
 
 From the 2.2.2 installed-copy test (`lite-20261111-01`) and the re-measurement of SKILL.md:
