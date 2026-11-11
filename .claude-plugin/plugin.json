@@ -1,7 +1,7 @@
 {
   "name": "council-dial-lite",
   "displayName": "Council Dial Lite",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "The script-free edition of Council Dial, for Claude Code: a council of Claude subagents, read-only by default, reviews your code, docs or plan in the setup you choose, a fresh agent checks the findings were copied word for word, and each run is logged so you can compare setups. It can flag a destructive command, such as an rm -rf whose target could resolve to the wrong data, alongside bugs, security issues and wrong docs, though a council can still miss things.",
   "author": {
     "name": "Ablation Lab"

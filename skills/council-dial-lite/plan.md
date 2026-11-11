@@ -38,10 +38,10 @@ The largest custom council is 22 agents with the check (21 in a raw run). Agree 
 - Then `/`, the combine method, and `+debate`, `+sequential`, `+appeal`, `+baseline`, `+running-code` and `+raw` for each one the run has, in that order: `+baseline` when `type.baseline` is `true`, and `+running-code` when `runningCode` is `allowed`. A run logged before Lite 1.6.0 has no `type.raw`, and isn't raw; one with no `runningCode` didn't allow it.
 - Then, for brief version 3, a space and `v3` (version 2 runs have nothing here).
 - Then the seats, from `type.seats`. Each seat's model is `models.env` when `models.force` is true, or else the alias asked for that seat, or else `models.env`, or else `models.main`, or else `inherit`; follow it with `/` and the seat's effort if one was asked for. If every seat has the same model and effort: a space, `@` and that, or nothing if it's `inherit` with no effort. Otherwise: a space, `@{`, the seats as `<seat>=<model>` joined by `, `, and `}`. The reviewers come first, as one `reviewers=…` if they all match, or else each by its role in lower case (sorted as above) or as `reviewer <k>`; then `judge`, `appeal`, `baseline` and `check` for those the run has.
-- Last, a space and `(Lite <liteVersion>)` from the run's `liteVersion`, such as `(Lite 2.2.1)`, so estimates and comparisons never mix runs of different Lite versions. Rebuild an older run's label with its own `liteVersion` the same way.
+- Last, a space and `(Lite <liteVersion>)` from the run's `liteVersion`, such as `(Lite 2.2.2)`, so estimates and comparisons never mix runs of different Lite versions. Rebuild an older run's label with its own `liteVersion` the same way.
 - A run logged before Lite 1.2.0 has no `type.seats`: every seat had the alias the user picked for every subagent (`models.requested`), and no effort. From 1.2.0, `models.requested` is the alias the user set for every subagent, if they set one, and otherwise `null`; the seats hold the rest.
 
-For example: `lite: specialised-3/judged+appeal v3 @claude-opus-5-5 (Lite 2.2.1)`, `lite: specialised-2 [api, perf]/judged+debate+appeal v3 @sonnet (Lite 2.2.1)`, `lite: generalist-3/pooled @sonnet/high (Lite 1.2.0)`, `lite: specialised-3/judged+appeal v3 @{reviewers=sonnet, judge=haiku, appeal=opus/max, check=claude-opus-5-5} (Lite 2.2.1)`, `lite: specialised-3/judged+appeal+raw v3 @claude-opus-5-5 (Lite 2.2.1)`, `lite: specialised-3/judged+debate+appeal+baseline v3 @claude-opus-5-5 (Lite 2.2.1)`, `lite: generalist-3/pooled+running-code v3 @sonnet (Lite 2.2.1)`, or `lite: generalist-2/consensus v3 (Lite 2.2.1)`.
+For example: `lite: specialised-3/judged+appeal v3 @claude-opus-5-5 (Lite 2.2.2)`, `lite: specialised-2 [api, perf]/judged+debate+appeal v3 @sonnet (Lite 2.2.2)`, `lite: generalist-3/pooled @sonnet/high (Lite 1.2.0)`, `lite: specialised-3/judged+appeal v3 @{reviewers=sonnet, judge=haiku, appeal=opus/max, check=claude-opus-5-5} (Lite 2.2.2)`, `lite: specialised-3/judged+appeal+raw v3 @claude-opus-5-5 (Lite 2.2.2)`, `lite: specialised-3/judged+debate+appeal+baseline v3 @claude-opus-5-5 (Lite 2.2.2)`, `lite: generalist-3/pooled+running-code v3 @sonnet (Lite 2.2.2)`, or `lite: generalist-2/consensus v3 (Lite 2.2.2)`.
 
 ## 2. Estimate, then ask
 
@@ -103,11 +103,11 @@ Build each brief just before you start its agent, from the templates. Then, befo
 ```json
 {
   "edition": "council-dial-lite",
-  "liteVersion": "2.2.1",
+  "liteVersion": "2.2.2",
   "briefVersion": 3,
   "runId": "lite-20261108-01",
   "planned": "2026-11-08",
-  "label": "lite: specialised-3/judged+appeal v3 @claude-opus-5-5 (Lite 2.2.1)",
+  "label": "lite: specialised-3/judged+appeal v3 @claude-opus-5-5 (Lite 2.2.2)",
   "target": "the files changed on branch fix-parser: src/parser.mjs and test/parser.test.mjs",
   "type": { "reviewers": "specialised", "n": 3, "roles": ["correctness", "security and privacy", "docs and policy accuracy"], "combine": "judged", "debate": false, "sequential": false, "baseline": false, "appeal": true, "raw": false,
     "seats": [{ "seat": "reviewer: correctness", "model": null, "effort": null }, { "seat": "reviewer: security and privacy", "model": null, "effort": null }, { "seat": "reviewer: docs and policy accuracy", "model": null, "effort": null }, { "seat": "judge", "model": null, "effort": null }, { "seat": "appeal", "model": null, "effort": null }, { "seat": "check", "model": null, "effort": null }] },
@@ -130,7 +130,7 @@ Build each brief just before you start its agent, from the templates. Then, befo
 }
 ```
 
-`tokenNote` is always the exact text above. `deviations`, `userRequests` and `outsideInstructions` are lists of one-line strings; SKILL.md's ground rules say which goes where. `liteVersion` is this plugin's version, the `version` in its `.claude-plugin/plugin.json`, which is 2.2.1; it's written here so you don't need to read that file, which is outside the skill folder and would ask for another permission. `type.raw` is `true` only for a raw run, whose `seats` and `agents` have no check; `analysis` stays `null` except in a raw run (section 10). `planned` is the run id's date, written `YYYY-MM-DD`. `agents` lists every agent in the order above, the check included (a raw run has none). Set an agent's `started` to `true` in the `run.json` change you make just before its Agent call. For each agent (or each group started together in one message), in this order:
+`tokenNote` is always the exact text above. `deviations`, `userRequests` and `outsideInstructions` are lists of one-line strings; SKILL.md's ground rules say which goes where. `liteVersion` is this plugin's version, the `version` in its `.claude-plugin/plugin.json`, which is 2.2.2; it's written here so you don't need to read that file, which is outside the skill folder and would ask for another permission. `type.raw` is `true` only for a raw run, whose `seats` and `agents` have no check; `analysis` stays `null` except in a raw run (section 10). `planned` is the run id's date, written `YYYY-MM-DD`. `agents` lists every agent in the order above, the check included (a raw run has none). Set an agent's `started` to `true` in the `run.json` change you make just before its Agent call. For each agent (or each group started together in one message), in this order:
 1. Save its brief to `briefs/` (section 3, "Briefs").
 2. Make one `run.json` change that sets its `started` to `true`. The same change may hold its `briefChecks` entry.
 3. Read `run.json` back, as below. A search or a re-read of reports that a step asks for may also come here; no other write and no Agent call may.
